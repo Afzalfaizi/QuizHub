@@ -6,5 +6,11 @@ class Category(SQLModel, table=True):
     category_name: str 
     category_description: str
 
-class Quiz(SQLModel, table=True):
+class QuizLevel(SQLModel, table=True):
     quiz_id: Optional[int] = Field(None, primary_key=True)
+    quiz_level : str
+    
+
+class Quiz(SQLModel, table=True):
+    question_id : Optional[int] =  Field(None, primary_key=True)
+    question: str
