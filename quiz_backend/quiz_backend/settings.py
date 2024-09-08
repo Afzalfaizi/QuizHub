@@ -1,4 +1,4 @@
-from starlette.config import config
+from starlette.config import Config
 
 try:
     config = Config(".env")
