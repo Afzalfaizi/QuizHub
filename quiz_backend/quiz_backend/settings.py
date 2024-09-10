@@ -8,7 +8,7 @@ except FileNotFoundError as e:
 
 db_url = config("DB_URL")
 db_test_url = config("DB_TEST_URL")
-access_expiry_time = timedelta(minutes=int(config.get("ACCESS_EXPIRY_KEY")))
-refresh_expriy_time = timedelta(days=int(config.get("REFRESH_EXPIRY_KEY")))
+access_expiry_time = timedelta(minutes=int(config.get("ACCESS_EXPIRY_TIME")))
+refresh_expriy_time = timedelta(days=int(config.get("REFRESH_EXPIRY_TIME")))
 secret_key = config.get("SECRET_KEY")
-algorithm = config.get("ALOGRITHM")
+algorithm = config.get("ALGORITHM", default="HS256")  # Provide a default if missing
