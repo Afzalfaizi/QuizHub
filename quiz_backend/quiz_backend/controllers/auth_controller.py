@@ -18,11 +18,14 @@ def generateToken(data,dict, expiry_time: timedelta):
     except JWTError as je:
         raise je
         
+def passwordIntoHash(plaintext:str):
+    hashedpassword = pwd_context.hash(plaintext)
+    return hashedpassword
 
 # Placeholder function to verify passwords
 def verfiyPassword():
     ...
-
+   
 # Placeholder function for token services (e.g., validation, decoding)
 def tokenService():
     ...
