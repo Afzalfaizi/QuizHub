@@ -23,9 +23,9 @@ def passwordIntoHash(plaintext:str):
     return hashedpassword
 
 # Placeholder function to verify passwords
-def verfiyPassword():
-    ...
-   
+def verfiyPassword(hashPass:str, plaintext:str):
+    verify_password = pwd_context.verify(plaintext, hash=hashPass)
+    return verify_password
 # Placeholder function for token services (e.g., validation, decoding)
 def tokenService():
     ...
