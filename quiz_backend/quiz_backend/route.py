@@ -1,77 +1,73 @@
-from fastapi import FastAPI,Request 
-from quiz_backend.db.db_connector import get_session, create_tables
-from contextlib import asynccontextmanager
-import quiz_backend.models.admin_models
-import quiz_backend.models.user_models
-import quiz_backend.models.quiz_models
-from quiz_backend.utils.exception import NotFoundException, InvalidInputException, ConflictException
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Request  # Import FastAPI and Request for building the API and handling requests
+from quiz_backend.db.db_connector import get_session, create_tables  # Import DB session and table creation utilities
+from contextlib import asynccontextmanager  # Import async context manager for managing app lifespan
+import quiz_backend.models.admin_models  # Import admin models for the app
+import quiz_backend.models.user_models  # Import user models for the app
+import quiz_backend.models.quiz_models  # Import quiz models for the app
+from quiz_backend.utils.exception import NotFoundException, InvalidInputException, ConflictException  # Custom exceptions
+from fastapi.responses import JSONResponse  # Import JSONResponse for custom exception handling responses
 
+# Lifespan function to manage app startup tasks
 @asynccontextmanager
 async def lifeSpan(app: FastAPI):
     print("Create Table...")
-    create_tables()
+    create_tables()  # Initialize and create tables
     yield
 
+app = FastAPI(lifespan=lifeSpan)  # Create FastAPI app with lifespan handler
 
-app = FastAPI(lifespan=lifeSpan)
-
-
+# Custom handler for "NotFoundException"
 @app.exception_handler(NotFoundException)
-def not_found(request:Request, exception: NotFoundException):
-   return JSONResponse(status_code=404, content=f"{exception.not_found} Not found" )
+def not_found(request: Request, exception: NotFoundException):
+    return JSONResponse(status_code=404, content=f"{exception.not_found} Not found")
 
+# Custom handler for "InvalidInputException"
 @app.exception_handler(InvalidInputException)
-def invalid_input(request:Request, exception: InvalidInputException):
-   return JSONResponse(status_code=404, content=f"{exception.invalid_input}" )
+def invalid_input(request: Request, exception: InvalidInputException):
+    return JSONResponse(status_code=404, content=f"{exception.invalid_input}")
 
-
+# Custom handler for "ConflictException"
 @app.exception_handler(ConflictException)
-def conflict_input(request:Request, exception: ConflictException):
-   return JSONResponse(status_code=404, content=f"{exception.conflict_input} already registerd" )
+def conflict_input(request: Request, exception: ConflictException):
+    return JSONResponse(status_code=404, content=f"{exception.conflict_input} already registered")
 
-
+# Default route for the home page
 @app.get("/")
 def home():
     return {"Welcome to Quiz App Project"}
 
+# Route to get a user by username, raises NotFoundException if not found
 @app.get("/api/getUser")
-def getUser(user:str):
-    if user=="faizi":
+def getUser(user: str):
+    if user == "faizi":
         raise NotFoundException("User")
-    return "user has found"
+    return "User has been found"
 
+# Route to validate user input
 @app.get("/api/validateUser")
 def validate_user(user: str):
-    # Example validations
-    if not user.isalpha():  # Only alphabetic characters allowed
+    # Check if the user input contains only alphabetic characters
+    if not user.isalpha():
         raise InvalidInputException("Invalid input: Only alphabetic characters are allowed.")
-    if len(user) < 3 or len(user) > 20:  # Username length should be between 3 and 20 characters
+    # Ensure username length is between 3 and 20 characters
+    if len(user) < 3 or len(user) > 20:
         raise InvalidInputException("Invalid input: Username must be between 3 and 20 characters.")
     return {"message": "User input is valid"}
 
+# Predefined list of registered emails
+registered_emails = ["faizidev@gmail.com", "haroon@gmail.com", "being@gmail.com"]
 
-
-# Simulated list of registered emails
-registered_emails = ["faizidev@gmail.com", "haroon@gmail.com","being@gmail.com"]
-
+# Route to register a new user, raises ConflictException if email is already registered
 @app.get("/api/register")
 def register_user(email: str):
     if email in registered_emails:
         raise ConflictException("User")
     return {"message": "User has been registered successfully."}
 
-
-
-
-
-
-
-
-
+# Note: Uncomment the following lines to run the app manually
 # def start():
 #     create_tables()
 #     uvicorn.run("quiz_backend.route:app", host="127.0.0.1", port=8080, reload=True)
 
-
+# Command to run the app with Poetry
 # poetry run uvicorn quiz_backend.route:app --reload
