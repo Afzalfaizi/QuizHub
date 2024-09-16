@@ -64,6 +64,10 @@ def register_user(email: str):
         raise ConflictException("User")
     return {"message": "User has been registered successfully."}
 
+@app.get("/adduser")
+def add_new_user():
+    return add_new_user
+
 # Note: Uncomment the following lines to run the app manually
 # def start():
 #     create_tables()
