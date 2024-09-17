@@ -50,3 +50,46 @@ def signUp(user_form: UserModel, session: Session):
         "access_token": access_token,
         "refresh_token": refresh_token
     }
+
+# login 
+
+def login(user_form: UserModel, session: Session):
+    # Retrieve all users from the database
+    users = session.exec(select(User))
+    
+    # Find the user with the matching email
+    user = next((user for user in users if user.user_email == user_form.user_email), None)
+    
+    if user is None:
+        raise ConflictException("Invalid email or password")
+    
+    # Verify the password
+    if not verfiyPassword(user_form.user_password, user.user_password):
+        raise ConflictException("Invalid email or password")
+    
+    # Prepare token data with user's name and email
+    data = {
+        "user_name": user.user_name,
+        "user_email": user.user_email
+    }
+    
+    # Generate access and refresh tokens
+    access_token = generateToken(data=data, expiry_time=access_expiry_time)
+    refresh_token = generateToken(data=data, expiry_time=refresh_expriy_time)
+    
+    # Update the refresh token in the database if it already exists
+    token = session.exec(select(Token).where(Token.user_id == user.id)).first()
+    if token:
+        token.refresh_token = refresh_token
+        session.commit()
+    else:
+        # Store the refresh token in the database
+        token = Token(refresh_token=refresh_token, user_id=user.id)
+        session.add(token)
+        session.commit()
+    
+    # Return the generated tokens
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token
+    }

@@ -29,7 +29,7 @@ def invalid_input(request: Request, exception: InvalidInputException):
 # Custom handler for "ConflictException"
 @app.exception_handler(ConflictException)
 def conflict_input(request: Request, exception: ConflictException):
-    return JSONResponse(status_code=404, content=f"{exception.conflict_input} already registered")
+    return JSONResponse(status_code=404, content=f"This {exception.conflict_input} already registered")
 
 # Default route for the home page
 @app.get("/")
@@ -64,9 +64,6 @@ def register_user(email: str):
         raise ConflictException("User")
     return {"message": "User has been registered successfully."}
 
-@app.get("/adduser")
-def add_new_user():
-    return add_new_user
 
 # Note: Uncomment the following lines to run the app manually
 # def start():
