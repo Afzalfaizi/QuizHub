@@ -51,7 +51,7 @@ def signUp(user_form: UserModel, session: Session):
         "refresh_token": refresh_token
     }
 
-# login 
+# login functionality 
 
 def login(user_form: UserModel, session: Session):
     # Retrieve all users from the database
