@@ -1,9 +1,9 @@
-from quiz_backend.utils.imports import User, Token, UserModel,LoginModel, Session, select, verfiyPassword, generateToken, ConflictException
-from quiz_backend.utils.exception import ConflictException
+from quiz_backend.utils.imports import User, Token, UserModel,LoginModel, Session, select, Annotated,Depends, verfiyPassword, generateToken,decodeToken, ConflictException
+from quiz_backend.utils.exception import ConflictException, NotFoundException, InvalidInputException
 from quiz_backend.settings import access_expiry_time, refresh_expriy_time
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-
-
+auth_schema = OAuth2PasswordBearer(tokenUrl="")
 
 def signUp(user_form: UserModel, session: Session):
     # Retrieve all users from the database
@@ -54,42 +54,51 @@ def signUp(user_form: UserModel, session: Session):
         "refresh_token": refresh_token
     }
 
+
+
 # login functionality 
 
-def login(user_login_form: LoginModel, session: Session):
+def login(login_form: OAuth2PasswordRequestForm, session: Session):
     # Retrieve all users from the database
     users = session.exec(select(User))
     for user in users:
         user_email = user.user_email
-        verify_password = verfiyPassword(user.user_password, login_form.user_password)
-        if user_email == login_form.user_email and verify_password:
-                data = {
+        verify_password = verfiyPassword(user.user_password, login_form.password)
+        if user_email == login_form.username and verify_password:
+            data = {
             "user_name": user.user_name,
             "user_email": user.user_email
         }
-                # Generate access and refresh tokens
-                access_token = generateToken(data=data, expiry_time=access_expiry_time)
-                refresh_token = generateToken(data=data, expiry_time=refresh_expriy_time)
-                # Store the refresh token in the database
-                token = Token(refresh_token=refresh_token, user_id=user.id)
-                session.add(token)
-                session.commit()
-                session.refresh(token)
-                # Return the generated tokens
-                return {
-                    "access_token": access_token,
-                    "refresh_token": refresh_token
-                }
-        else:
-            InvalidInputException("Email or Password")
-    
-
-
-    
-    # Update the refresh token in the database if it already exists
-    token = session.exec(select(Token).where(Token.user_id == user.id)).first()
-    if token:
-        token.refresh_token = refresh_token
+        # Generate access and refresh tokens
+        access_token = generateToken(data=data, expiry_time=access_expiry_time)
+        refresh_token = generateToken(data=data, expiry_time=refresh_expriy_time)
+        #  Store the refresh token in the database
+        token = Token(refresh_token=refresh_token, user_id=user.id)
+        session.add(token)
         session.commit()
-       
+        session.refresh(token)
+        # Return the generated tokens
+        return {
+                "access_token": access_token,
+                "refresh_token": refresh_token
+                }
+    else:
+        raise InvalidInputException("Email or Password")
     
+def getUser(token:Annotated[str,Depends(auth_schema)], session:Session):
+    try:
+        if token:
+            data = decodeToken(token)
+            user_email = data["user_email"]
+            user = session.exec(select(User).where(User.user_email == user_email)).one()
+    except:
+        raise NotFoundException("Token")
+
+    
+    # # Update the refresh token in the database if it already exists
+    # token = session.exec(select(Token).where(Token.user_id == user.id)).first()
+    # if token:
+    #     token.refresh_token = refresh_token
+    #     session.commit()
+       
+    # #

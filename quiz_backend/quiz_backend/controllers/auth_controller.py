@@ -17,7 +17,14 @@ def generateToken(data,dict, expiry_time: timedelta):
         return token
     except JWTError as je:
         raise je
-        
+
+
+def decodeToken(token:str):
+    try:
+        decoded_data = jwt.decode(token, secret_key, algorithm=algorithm)
+        return decodeToken   
+    except JWTError as je:
+        raise je
 def passwordIntoHash(plaintext:str):
     hashedpassword = pwd_context.hash(plaintext)
     return hashedpassword

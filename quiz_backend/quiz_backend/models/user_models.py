@@ -6,7 +6,7 @@ class LoginModel(SQLModel):
     user_email: str
     user_password: str
 
-class UserModel():
+class UserModel(LoginModel):
     user_name:  str
 
 
