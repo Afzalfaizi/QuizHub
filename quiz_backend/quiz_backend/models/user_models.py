@@ -2,10 +2,13 @@ from sqlmodel import SQLModel,Field
 from typing import Optional
 
 
-class UserModel(SQLModel):
-    user_name:  str
+class LoginModel(SQLModel):
     user_email: str
     user_password: str
+
+class UserModel():
+    user_name:  str
+
 
 class User(UserModel, table=True):
     user_id: Optional[int] = Field(None, primary_key=True)
