@@ -91,6 +91,7 @@ def getUser(token:Annotated[str,Depends(auth_schema)], session:Session):
             data = decodeToken(token)
             user_email = data["user_email"]
             user = session.exec(select(User).where(User.user_email == user_email)).one()
+            return user
     except:
         raise NotFoundException("Token")
 
