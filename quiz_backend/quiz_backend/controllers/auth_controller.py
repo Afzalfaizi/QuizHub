@@ -2,9 +2,11 @@ from jose import jwt, JWTError
 from passlib.context import CryptContext
 from datetime import timedelta
 from quiz_backend.settings import algorithm, secret_key
-
+from quiz_backend.utils.imports import TypedDict, timedelta
+from quiz_backend.utils.imports import TokenType
 
 pwd_context = CryptContext(schemes="bcrypt")
+
 
 
 def generateToken(data,dict, expiry_time: timedelta):
@@ -33,6 +35,20 @@ def passwordIntoHash(plaintext:str):
 def verfiyPassword(hashPass:str, plaintext:str):
     verify_password = pwd_context.verify(plaintext, hash=hashPass)
     return verify_password
+
+def generateAccessAndRefreshToken(user_details:dict[str, Union[str, Any]]):
+    data = {
+        "user_name":user_details["user_name"],
+        "user_email":user_details["user_email"],
+    }
+    access_token = generateToken(data, user_details["access_expiry_time"])
+    refresh_token = generateToken(data, user_details["refresh_expiry_time"])
+    
+    return{
+        "access_token":access_token,
+        "refresh_token":refresh_token
+    }
+
 # Placeholder function for token services (e.g., validation, decoding)
 def tokenService():
     ...
