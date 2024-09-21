@@ -13,6 +13,7 @@ from fastapi import Depends
 async def lifeSpan(app: FastAPI):
     print("Create Table...")
     create_tables()  # Initialize and create tables
+    
     yield
 
 app = FastAPI(lifespan=lifeSpan)  # Create FastAPI app with lifespan handler
@@ -66,10 +67,6 @@ def register_user(email: str):
     return {"message": "User has been registered successfully."}
 
 
-# Note: Uncomment the following lines to run the app manually
-# def start():
-#     create_tables()
-#     uvicorn.run("quiz_backend.route:app", host="127.0.0.1", port=8080, reload=True)
 
-# Command to run the app with Poetry
+
 # poetry run uvicorn quiz_backend.route:app --reload

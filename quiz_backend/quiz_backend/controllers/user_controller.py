@@ -47,41 +47,38 @@ def signUp(user_form: UserModel, session: Session):
     }
 
 
+# Login Function
 
-# # login functionality 
+def login(login_form: OAuth2PasswordRequestForm, session:Session):
+    users = session.exec(select(User))
+    for user in users:
+        user_email = user.user_email
+        verify_password = verfiyPassword(user.user_password, login_form.password)
+        if user_email == login_form.username and verify_password:
+            data = {
+                "user_name": user.user_name,
+                "user_email": user.user_email,
+                }
+            access_token = generateToken(data=data, expiry_time=access_expiry_time)
+            refresh_token = generateToken(data=data, expiry_time=refresh_expriy_time)
+            Token = Token(refresh_token=refresh_token)
+            session.add(token)
+            session.commit()
+            session.refresh(token)
+            return {
+                "access_token": access_token,
+                "refresh_token": refresh_token
+                }
+        else:
+            raise InvalidInputException("Email or Password")
+            
 
-# def login(login_form: OAuth2PasswordRequestForm, session: Session):
-#     # Retrieve all users from the database
-#     users = session.exec(select(User))
-#     for user in users:
-#         user_email = user.user_email
-#         verify_password = verfiyPassword(user.user_password, login_form.password)
-#         if user_email == login_form.username and verify_password:
-#             data = {
-#                 "user_name": user.user_name,
-#                 "user_email": user.user_email,
-#                 "access_expiry_time": access_expiry_time,
-#                 "refresh_expiry_time": refresh_expriy_time
-#     }
-
-#         token_data  = generateAccessAndRefreshToken(data)
-#         # Update the refresh token in the database
-#         token = session.exex(select(Token).where(Token.user_id == user.user_id)).one()
-#         token.refresh_token = token_data["refresh_token"]
-#         session.add(token)
-#         session.commit()
-#         session.refresh(token)
-#         # Return the generated tokens
-#         return token_data
-#     else:
-#         raise InvalidInputException("Email or Password")
-    
-# def getUser(token:Annotated[str,Depends(auth_schema)], session:Session):
-#     try:
-#         if token:
-#             data = decodeToken(token)
-#             user_email = data["user_email"]
-#             user = session.exec(select(User).where(User.user_email == user_email)).one()
-#             return user
-#     except:
-#         raise NotFoundException("Token")
+def getUser(token:Annotated[str,Depends(auth_schema)], session:Session):
+    try:
+        if token:
+            data = decodeToken(token)
+            user_email = data["user_email"]
+            user = session.exec(select(User).where(User.user_email == user_email)).one()
+            return user
+    except:
+        raise NotFoundException("Token")

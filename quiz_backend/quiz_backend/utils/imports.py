@@ -4,3 +4,4 @@ from sqlmodel import Session, select
 from quiz_backend.controllers.auth_controller import passwordIntoHash, verfiyPassword, generateToken, decodeToken
 from fastapi import Depends
 from typing import Annotated
+from datetime import timedelta
