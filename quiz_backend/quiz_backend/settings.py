@@ -1,5 +1,5 @@
 from starlette.config import Config
-from quiz_backend.utils.imports import timedelta
+from datetime import timedelta 
 try:
     config = Config(".env")
 except FileNotFoundError as e:

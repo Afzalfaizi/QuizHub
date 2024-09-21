@@ -1,11 +1,12 @@
-from fastapi import FastAPI, Request  # Import FastAPI and Request for building the API and handling requests
-from quiz_backend.db.db_connector import get_session, create_tables  # Import DB session and table creation utilities
-from contextlib import asynccontextmanager  # Import async context manager for managing app lifespan
-import quiz_backend.models.admin_models  # Import admin models for the app
-import quiz_backend.models.user_models  # Import user models for the app
-import quiz_backend.models.quiz_models  # Import quiz models for the app
-from quiz_backend.utils.exception import NotFoundException, InvalidInputException, ConflictException  # Custom exceptions
-from fastapi.responses import JSONResponse  # Import JSONResponse for custom exception handling responses
+from fastapi import FastAPI, Request  
+from quiz_backend.db.db_connector import get_session, create_tables  
+from contextlib import asynccontextmanager  
+import quiz_backend.models.admin_models  
+import quiz_backend.models.user_models  
+import quiz_backend.models.quiz_models  
+from quiz_backend.utils.exception import NotFoundException, InvalidInputException, ConflictException 
+from fastapi.responses import JSONResponse  
+from fastapi import Depends
 
 # Lifespan function to manage app startup tasks
 @asynccontextmanager
