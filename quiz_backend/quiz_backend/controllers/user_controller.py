@@ -11,13 +11,10 @@ def signUp(user_form: UserModel, session: Session):
     for user in users:
         is_email_exist = user.user_email == user_form.user_email
         is_password_exist = verfiyPassword(user.user_password, user.user_password)
-        # Raise exception if email and password both match
         if is_email_exist and is_password_exist:
             raise ConflictException("email and password")
-        # Raise exception if only email exists
         elif is_email_exist:
             raise ConflictException("email")
-        # Raise exception if only password exists
         elif is_password_exist:
             raise ConflictException("password")
 
@@ -37,7 +34,7 @@ def signUp(user_form: UserModel, session: Session):
         "user_email": user.user_email,}
     access_token = generateToken(data=data, expiry_time=access_expiry_time)
     refresh_token = generateToken(data=data, expiry_time=refresh_expriy_time)
-    token = Token(refresh_token=refresh_token)
+    token = Token(user_id=user.user_id, refresh_token=refresh_token)
     session.add(token)
     session.commit()  
     # Return the generated tokens
@@ -48,7 +45,6 @@ def signUp(user_form: UserModel, session: Session):
 
 
 # Login Function
-
 def login(login_form: OAuth2PasswordRequestForm, session:Session):
     users = session.exec(select(User))
     for user in users:
@@ -61,7 +57,9 @@ def login(login_form: OAuth2PasswordRequestForm, session:Session):
                 }
             access_token = generateToken(data=data, expiry_time=access_expiry_time)
             refresh_token = generateToken(data=data, expiry_time=refresh_expriy_time)
-            Token = Token(refresh_token=refresh_token)
+            token = session.exec(select(Token).where(Token.user_id == user.user_id)).one()
+            token.refresh_token =  data["refresh_token"]
+            token = Token(refresh_token=refresh_token)
             session.add(token)
             session.commit()
             session.refresh(token)

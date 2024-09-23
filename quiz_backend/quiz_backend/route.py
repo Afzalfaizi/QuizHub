@@ -7,6 +7,7 @@ import quiz_backend.models.quiz_models
 from quiz_backend.utils.exception import NotFoundException, InvalidInputException, ConflictException 
 from fastapi.responses import JSONResponse  
 from fastapi import Depends
+from quiz_backend.utils.imports import Annotated
 
 # Lifespan function to manage app startup tasks
 @asynccontextmanager
@@ -38,12 +39,29 @@ def conflict_input(request: Request, exception: ConflictException):
 def home():
     return {"Welcome to Quiz App Project"}
 
+
+
+@app.post("/api/userSignup")
+def userSignup():
+    pass
+
+
+def getUser(name:str):
+    return name
+
+@app.get("/api/user")
+def postlogin(user: Annotated[str,Depends(getUser)]):
+    return user
+
+
+
+
 # Route to get a user by username, raises NotFoundException if not found
-@app.get("/api/getUser")
-def getUser(user: str):
-    if user == "faizi":
-        raise NotFoundException("User")
-    return "User has been found"
+# @app.get("/api/getUser")
+# def getUser(user: str):
+#     if user == "faizi":
+#         raise NotFoundException("User")
+#     return "User has been found"
 
 # Route to validate user input
 @app.get("/api/validateUser")
