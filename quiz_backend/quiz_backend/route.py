@@ -53,15 +53,12 @@ def getUser(name:str):
 def postlogin(user: Annotated[str,Depends(getUser)]):
     return user
 
-
-
-
 # Route to get a user by username, raises NotFoundException if not found
-# @app.get("/api/getUser")
-# def getUser(user: str):
-#     if user == "faizi":
-#         raise NotFoundException("User")
-#     return "User has been found"
+@app.get("/api/getUser")
+def getUser(user: str):
+    if user == "faizi":
+        raise NotFoundException("User")
+    return "User has been found"
 
 # Route to validate user input
 @app.get("/api/validateUser")

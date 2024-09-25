@@ -4,6 +4,8 @@ from quiz_backend.settings import access_expiry_time, refresh_expriy_time
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from quiz_backend.controller.auth_controller import generateAccessAndRefreshToken
 
+auth_schema = OAuth2PasswordBearer(tokenUrl="")
+
 def signUp(user_form: UserModel, session: Session):
     # Retrieve all users from the database
     users = session.exec(select(User))
@@ -31,17 +33,20 @@ def signUp(user_form: UserModel, session: Session):
     # Prepare token data with user's name and email
     data = {
         "user_name": user.user_name,
-        "user_email": user.user_email,}
-    access_token = generateToken(data=data, expiry_time=access_expiry_time)
-    refresh_token = generateToken(data=data, expiry_time=refresh_expriy_time)
-    token = Token(user_id=user.user_id, refresh_token=refresh_token)
+        "user_email": user.user_email,
+        "access_expiry_time": access_expiry_time,
+        "refresh_expiry_time": refresh_expriy_time
+        }
+    
+    # access_token = generateToken(data=data, expiry_time=access_expiry_time)
+    # refresh_token = generateToken(data=data, expiry_time=refresh_expriy_time)
+    
+    token_data = generateAccessAndRefreshToken(data)
+    token = Token(refresh_token=token_data["refresh_token"])
     session.add(token)
     session.commit()  
     # Return the generated tokens
-    return {
-        "access_token": access_token,
-        "refresh_token": refresh_token
-    }
+    return token_data
 
 
 # Login Function
@@ -54,19 +59,19 @@ def login(login_form: OAuth2PasswordRequestForm, session:Session):
             data = {
                 "user_name": user.user_name,
                 "user_email": user.user_email,
-                }
-            access_token = generateToken(data=data, expiry_time=access_expiry_time)
-            refresh_token = generateToken(data=data, expiry_time=refresh_expriy_time)
-            token = session.exec(select(Token).where(Token.user_id == user.user_id)).one()
-            token.refresh_token =  data["refresh_token"]
-            token = Token(refresh_token=refresh_token)
+                "access_expiry_time": access_expiry_time,
+                "refresh_expiry_time": refresh_expriy_time
+                    }
+    
+    # access_token = generateToken(data=data, expiry_time=access_expiry_time)
+    # refresh_token = generateToken(data=data, expiry_time=refresh_expriy_time)
+    
+            token_data = generateAccessAndRefreshToken(data)
+            token = Token(refresh_token =  token_data["refresh_token"])
             session.add(token)
             session.commit()
             session.refresh(token)
-            return {
-                "access_token": access_token,
-                "refresh_token": refresh_token
-                }
+            return token_data
         else:
             raise InvalidInputException("Email or Password")
             
