@@ -7,7 +7,8 @@ import quiz_backend.models.quiz_models
 from quiz_backend.utils.exception import NotFoundException, InvalidInputException, ConflictException 
 from fastapi.responses import JSONResponse  
 from fastapi import Depends
-from quiz_backend.utils.imports import Annotated
+from typing import Annotated
+from quiz_backend.controllers.user_controller import signUp
 
 # Lifespan function to manage app startup tasks
 @asynccontextmanager
@@ -42,8 +43,10 @@ def home():
 
 
 @app.post("/api/userSignup")
-def userSignup():
-    pass
+def userSignup(tokens_data:Annotated[dict,signUp]):
+    if not tokens_data:
+        raise NotFoundException("User")
+    return tokens_data
 
 
 def getUser(name:str):

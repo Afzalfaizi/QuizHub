@@ -1,12 +1,13 @@
-from quiz_backend.utils.imports import User, Token, UserModel,LoginModel, Session, select, Annotated,Depends, verfiyPassword, generateToken,decodeToken, ConflictException
+from quiz_backend.utils.imports import User, Token, UserModel,LoginModel, Session, select, Annotated, ConflictException
 from quiz_backend.utils.exception import ConflictException, NotFoundException, InvalidInputException
 from quiz_backend.settings import access_expiry_time, refresh_expriy_time
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from quiz_backend.controller.auth_controller import generateAccessAndRefreshToken
+from quiz_backend.controllers.auth_controllers import generateAccessAndRefreshToken, generateToken, verfiyPassword, decodeToken
+from fastapi import Depends
 
 auth_schema = OAuth2PasswordBearer(tokenUrl="")
 
-def signupFn(user_form: UserModel, session: Session):
+def signUp(user_form: UserModel, session: Session):
     # Retrieve all users from the database
     users = session.exec(select(User))
     # Check if email or password already exists in the database
@@ -44,7 +45,7 @@ def signupFn(user_form: UserModel, session: Session):
     token_data = generateAccessAndRefreshToken(data)
     
     # save the refresh token in the database
-    token = Token(user_id=user.user_id, refresh_token=token_data["refresh_token"])
+    token = Token(user_id=user.user_id, refresh_token=token_data["refresh_token"]["token"])
     session.add(token)
     session.commit()  
     # Return the generated tokens
@@ -52,7 +53,7 @@ def signupFn(user_form: UserModel, session: Session):
 
 
 # Login Function
-def loginFn(login_form: OAuth2PasswordRequestForm, session:Session):
+def login(login_form: OAuth2PasswordRequestForm, session:Session):
     users = session.exec(select(User))
     for user in users:
         user_email = user.user_email
@@ -71,7 +72,7 @@ def loginFn(login_form: OAuth2PasswordRequestForm, session:Session):
             token_data = generateAccessAndRefreshToken(data)
             # update the refresh token in the database
             token = session.exec(select(Token).where(Token.user_id == user.user_id)).one()
-            token.refresh_token = token_data["refresh_token"]
+            token.refresh_token = token_data["refresh_token"]["token"]
             session.add(token)
             session.commit()
             session.refresh(token)

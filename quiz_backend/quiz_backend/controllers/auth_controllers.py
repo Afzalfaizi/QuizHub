@@ -43,13 +43,22 @@ def generateAccessAndRefreshToken(user_details: dict[str, Any]):
         "user_name": user_details["user_name"],
         "user_email": user_details["user_email"],
     }
-    access_token = generateToken(data=data, expiry_time=access_expiry_time)
-    refresh_token = generateToken(data=data, expiry_time=refresh_expriy_time)
+    access_token = generateToken(data, user_details=["access_expiry_time"])
+    refresh_token = generateToken(data, user_details=["refresh_expriy_time"])
+    access_expiry_time = user_details["access_expiry_time"].total_seconds()
+    refresh_expiry_time = user_details["refresh_expiry_time"].total_seconds()
+
     
     return{
-        "access_token":access_token,
-        "refresh_token":refresh_token
-    }
+        "access_token":{
+            "token": access_token,
+            "access_expiry_time": access_expiry_time
+            },
+        "refresh_token":{
+            "token": refresh_token,
+            "refresh_expiry_time": refresh_expiry_time
+            }
+        }
 
 
 # Placeholder function for token services (e.g., validation, decoding)
