@@ -38,7 +38,7 @@ def conflict_input(request: Request, exception: ConflictException):
 # Default route for the home page
 @app.get("/")
 def home():
-    return {"Welcome to Quiz App Project"}
+    return {"Welcome to AI Quiz Generator App"}
 
 
 

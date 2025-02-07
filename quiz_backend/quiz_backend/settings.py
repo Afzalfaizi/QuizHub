@@ -1,5 +1,6 @@
 from starlette.config import Config
 from datetime import timedelta 
+
 try:
     config = Config(".env")
 except FileNotFoundError as e:
