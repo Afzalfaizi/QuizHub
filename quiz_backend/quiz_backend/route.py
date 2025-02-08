@@ -71,7 +71,7 @@ def validate_user(user: str):
         raise InvalidInputException("Invalid input: Only alphabetic characters are allowed.")
     # Ensure username length is between 3 and 20 characters
     if len(user) < 3 or len(user) > 20:
-        raise InvalidInputException("Invalid input: Username must be between 3 and 20 characters.")
+        raise InvalidInputException("Invalid input: Username must be between 3 and 15 characters.")
     return {"message": "User input is valid"}
 
 # Predefined list of registered emails
