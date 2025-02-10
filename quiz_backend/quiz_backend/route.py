@@ -75,7 +75,7 @@ def validate_user(user: str):
     return {"message": "User input is valid"}
 
 # Predefined list of registered emails
-registered_emails = ["faizidev@gmail.com", "haroon@gmail.com", "beingtalha@gmail.com"]
+registered_emails = ["afzaldeveloper7@gmail.com", "haroonharry@gmail.com", "beingtalha@gmail.com"]
 
 # Route to register a new user, raises ConflictException if email is already registered
 @app.get("/api/register")
